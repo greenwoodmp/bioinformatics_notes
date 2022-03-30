@@ -1,0 +1,39 @@
+### 18/02/2022
+Setting up HybPiper 
+
+Following online guide for installation(https://github.com/mossmatters/HybPiper/wiki/Installation)
+
+1. Install dependencies through nix environment
+2. use "git clone https://github.com/mossmatters/HybPiper.git" to get HybPiper. Ran this in a tools folder and got a folder called "HybPiper" with all the necessary scripts
+
+Exploring the Lepidopteran UCE library from Faircloth 2017:
+
+# Get the headers for each fasta bait sequence
+grep ">" /bettik/greenwom/WGS/orthologs/Lepidoptera-UCE-1.3K-v1.fasta > uce_names.txt
+
+# Count the number of baits (14363; is noted as 14363 in the paper)
+grep -c '>' uce_names.txt
+
+# Notably, some UCEs are covered by multiple baits from different exons or different species
+# This is reflected in the fasta naming structure, where each uce is labeled as "uce-NUMBER_VERSION", followed by metadata on bait designer, target organism etc
+# To get the number of unique uce loci targeted by this bait set I did the following
+# Using the underscore as a delimiter, pull only "uce-NUMBER" for each header 
+# Then sort these trimmed headers, keep only unique records, and count these records. Technically, the dataset is already sorted but this is for the sake of robustness
+# The final loci count is 1381, which matches the report in Faircloth 2017 exactly
+awk -F '_' '{print $1}' uce_names.txt > trimmed_uce_names.txt
+sort trimmed_uce_names.txt | uniq | grep -c '>'
+
+### 21/02/2022
+Realised that HybPiper might only be able to assemble reads that match along a reference. The issue
+here is that the UCE baits from Faircloth 2017 do not have associated full-length reference genes.
+
+Instead, going to try the approach of Breinholt 2017 (https://academic.oup.com/sysbio/article/67/1/78/3796843#supplementary-data)
+who developed a smaller anchored hybrid enrichment (AHE) library and made scripts for reassembling genomic reads onto
+full length references (which are also available; see https://datadryad.org/stash/dataset/doi:10.5061/dryad.rf7g5).
+
+However, going to attempt to assemble the Breinholt 2017 AHE references with a better-documented aligner/assembler called aTRAM 2 (https://journals.sagepub.com/doi/pdf/10.1177/1176934318774546). 
+The tutorial is available at https://github.com/juliema/aTRAM. I couldn't install using pip so had to use conda as follows:
+-Move to the aTRAM directory obtained using git clone https://github.com/juliema/aTRAM.git
+>source /applis/environments/conda.sh
+>conda env create -f environment.yml
+>conda activate aTRAM

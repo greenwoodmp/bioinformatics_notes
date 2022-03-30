@@ -1,0 +1,48 @@
+\begin{thebibliography}{1}
+
+\bibitem{arnason2018}
+{\sc {\'A}rnason, {\'U}., Lammers, F., Kumar, V., Nilsson, M.~A., and Janke,
+  A.}
+\newblock Whole-genome sequencing of the blue whale and other rorquals finds
+  signatures for introgressive gene flow.
+\newblock {\em Science advances 4}, 4 (2018), eaap9873.
+
+\bibitem{breinholt2017}
+{\sc Breinholt, J.~W., Earl, C., Lemmon, A.~R., Lemmon, E.~M., Xiao, L., and
+  Kawahara, A.~Y.}
+\newblock {Resolving Relationships among the Megadiverse Butterflies and Moths
+  with a Novel Pipeline for Anchored Phylogenomics}.
+\newblock {\em Systematic Biology 67}, 1 (05 2017), 78--93.
+
+\bibitem{capella2009}
+{\sc Capella-Guti{\'e}rrez, S., Silla-Mart{\'\i}nez, J.~M., and Gabald{\'o}n,
+  T.}
+\newblock trimal: a tool for automated alignment trimming in large-scale
+  phylogenetic analyses.
+\newblock {\em Bioinformatics 25}, 15 (2009), 1972--1973.
+
+\bibitem{faircloth2017}
+{\sc Faircloth, B.~C.}
+\newblock Identifying conserved genomic elements and designing universal bait
+  sets to enrich them.
+\newblock {\em Methods in Ecology and Evolution 8}, 9 (2017), 1103--1112.
+
+\bibitem{galtier1996}
+{\sc Galtier, N., Gouy, M., and Gautier, C.}
+\newblock Seaview and phylo\_win: two graphic tools for sequence alignment and
+  molecular phylogeny.
+\newblock {\em Bioinformatics 12}, 6 (1996), 543--548.
+
+\bibitem{roure2012}
+{\sc Roure, B., Baurain, D., and Philippe, H.}
+\newblock Impact of missing data on phylogenies inferred from empirical
+  phylogenomic data sets.
+\newblock {\em Molecular Biology and Evolution 30}, 1 (08 2012), 197--214.
+
+\bibitem{streicher2015}
+{\sc Streicher, J.~W., Schulte, James~A., I., and Wiens, J.~J.}
+\newblock {How Should Genes and Taxa be Sampled for Phylogenomic Analyses with
+  Missing Data? An Empirical Study in Iguanian Lizards}.
+\newblock {\em Systematic Biology 65}, 1 (09 2015), 128--145.
+
+\end{thebibliography}

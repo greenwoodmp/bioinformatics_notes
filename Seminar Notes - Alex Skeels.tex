@@ -1,0 +1,49 @@
+\documentclass[12pt]{report}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Package Loading
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\usepackage{url, fancyvrb, newverbs, xcolor, tcolorbox}
+
+% The code below will make it so that verbatim text blocks can be coloured, from https://tex.stackexchange.com/questions/141100/getting-verbatim-with-soft-grey-background-as-in-tex-stackexchange
+\definecolor{background}{rgb}{0.945, 0.973, 0.969}
+\definecolor{justgray}{gray}{0.75}
+
+% Use listings and tcolorbox to make text chunk boxes that can be wrapped. Seehttps://tex.stackexchange.com/questions/234276/boxed-text-inside-tcolorbox-tcblisting. If only using verbatim, code chunk lines run off the document as wrapping can't be computed
+
+% Say which tcolorbox libraries to use
+\tcbuselibrary{skins,breakable,listings}
+
+ % Try to define a style for listing in text chunks that allows comment lines to be printed in a different colour - in progress
+
+\newenvironment{codewrap}{%
+  \tcblisting{listing only,colback=background,colframe=background,enlarge
+  top by=0mm,top=-2mm,bottom=2mm,enhanced,
+  after={\par\vspace{0.5\baselineskip}\noindent},
+  listing options={columns=fullflexible,basicstyle=\ttfamily,breaklines=true,
+    language=HTML,escapechar=|},}}
+{\endtcblisting}
+
+
+\bibliographystyle{acm}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%% Document Metadata and Typesetting
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\author{Matthew Peter Greenwood}
+\title{Bioinformatics Lab Book}
+\date{18/02/2022}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{document}
+
+\section{Talk notes}
+
+Works on simulations in an evolutionary context
+
+\end{document}

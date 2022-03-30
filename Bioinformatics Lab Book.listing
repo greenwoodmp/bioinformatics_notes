@@ -1,0 +1,2 @@
+  > bcftools view /bettik/greenwom/WGS/Genotypes/coenonympha.bcf -Oz -o /bettik/greenwom/WGS/Genotypes/coenonympha.vcf.gz
+  > bcftools index /bettik/greenwom/WGS/Genotypes/coenonympha.vcf.gz
