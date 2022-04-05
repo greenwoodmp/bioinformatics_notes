@@ -4,3 +4,6 @@ This section is devoted specifically to the documentation of small command strin
 
 # The below snippet (from \url{https://www.biostars.org/p/373962/}) is useful for counting the length of each sequence present in a fasta file. I used this to check the lengths of contigs in an assembled genome fasta file, for example.
 awk '/^>/{if (l!="") print l; print; l=0; next}{l+=length($0)}END{print l}' /bettik/PROJECTS/pr-mosquito/COMMON/Coenonympha/Genomes/BST1.hifiasm.p_ctg.cleaned.sorted.fa |paste - -
+
+# To remove line breaks in a multifasta do the following (see https://stackoverflow.com/questions/15857088/remove-line-breaks-in-a-fasta-file)
+awk '!/^>/ {printf "%s",$0; n="\n"} /^>/ {print n$0; n=""} END {printf "%s",n}' file.fa

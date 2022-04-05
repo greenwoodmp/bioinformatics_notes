@@ -611,6 +611,11 @@ INPUT Bioinformatics Lab Book.listing
 INPUT ./Bioinformatics Lab Book.listing
 INPUT Bioinformatics Lab Book.listing
 INPUT c:/texlive/2021/texmf-dist/fonts/tfm/public/cm/cmbx12.tfm
+INPUT ./Images/alignment_workflow.PNG
+INPUT ./Images/alignment_workflow.PNG
+INPUT Images/alignment_workflow.PNG
+INPUT ./Images/alignment_workflow.PNG
+INPUT ./Images/alignment_workflow.PNG
 OUTPUT Bioinformatics Lab Book.listing
 INPUT ./Bioinformatics Lab Book.listing
 INPUT Bioinformatics Lab Book.listing

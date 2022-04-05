@@ -266,6 +266,12 @@ I finally managed to get ANGSD to run by throwing an unnecessarily large number 
 
 The goal, is now, to generate a whole genome sequence for each accession that includes called genotypes from ANGSD, but also notes regions where the accession has no genome coverage. See Figure 1 for the intended workflow. This would largely invalidate the approach suggested on 23rd of March, 2022 and would match closely with an approach used by \'Arnason et al. \cite{arnason2018} to study the demography and evolutionary history of whales using whole-genome sequencing (WGS) data.
 
+\begin{figure}[!h]
+        \centering
+        \includegraphics[height=6cm]{Images/alignment_workflow.PNG}
+        \caption{Figure 1: A basic idea for a workflow to recover full genome ``alignments'' of all sequenced accessions using bam files. Note, this is not a traditional alignment in the sense that accession data was not pairwise-aligned; instead, the alignment of accessions stems from high-quality/stringency mapping to an identical reference sequence. \emph{This is still being refined.}}
+\end{figure}
+
 At the first hurdle, an issue was encountered. The bfctools ``consensus'' command requires that an indexed vcf/bcf file be used. Unfortunately, the output of ANGSD does not seem to directly meet these criteria. Indexing can simply be completed using the ``bgzip'' and ``tabix'' packages (see \url{https://www.biostars.org/p/367960/}) but these are not immediately available through the Nix repository. Instead, I will attempt to use an entirely bcftools-based approach suggested by user ``pd3'' at the following link: \url{https://github.com/samtools/bcftools/issues/668}. Essentially, this involved first converting the bcf file to a zipped vcf, and then indexing the zipped vcf file.
 
 \begin{codewrap}
@@ -296,6 +302,10 @@ To see if the consensus contruction, variant insertion, and masking worked, I wr
          \includegraphics[height=4cm]{Images/SeaViewMSA_3.PNG}
          \caption{Figure 4: An example of reasonably common``gappy'' domains of the multiple species alignment (MSA), at least for this considered genomic region.}
  \end{figure}
+
+I have split the scaffolds into abutting windows of 100000 bp (see scripts ``7.1-.sh'', ``7.2-.sh'', and ``7.3-SplitScaffoldsIntoAlignedWindows.sh'') that can be used to infer species topologies along scaffolds and assemble a consensus tree with ASTRAL III (ref). I plan to use trimAl to cut out gappy regions of these alignments. Then, I want to apply AMAS (ref) to determine the quality of trimmed alignments and to provide a metric for the filtering of useful alignments. In the process of reading up on AMAS, I've discovered it may be capable of splitting fastas into abutting windows, as is accomplished by my ``7.X'' series of scripts.  
+
+Things still to do: filter by mapping quality before making consensus genomes; mask repeat regions. Also, it could be worthwhile to try less stringent ANGSD filtering; e.g., min allele frequency of \~0 and a lower minInd.
 
 \bibliography{citations}
 
