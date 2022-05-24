@@ -6,7 +6,9 @@
 %% Package Loading
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\usepackage{url, fancyvrb, newverbs, xcolor, tcolorbox}
+\usepackage{url, fancyvrb, newverbs, xcolor, tcolorbox, listings}
+
+%packes to add - realbox, minted
 
 % The code below will make it so that verbatim text blocks can be coloured, from https://tex.stackexchange.com/questions/141100/getting-verbatim-with-soft-grey-background-as-in-tex-stackexchange
 \definecolor{background}{rgb}{0.945, 0.973, 0.969}
@@ -27,7 +29,11 @@
     language=HTML,escapechar=°},}}
 {\endtcblisting}
 
+% Make it so that inline verbatim text behaves similarly to the verbatim chunks defined above
+\newcommand\ilcodewrap{\adjustbox{cfbox=background}}
 
+
+% Set reference style
 \bibliographystyle{acm}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -37,6 +43,9 @@
 \author{Matthew Peter Greenwood}
 \title{Bioinformatics Lab Book}
 \date{18/02/2022}
+
+% Change the page margins
+%\usepackage[margin=1.2in]{geometry}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -269,7 +278,7 @@ The goal, is now, to generate a whole genome sequence for each accession that in
 \begin{figure}[!h]
         \centering
         \includegraphics[height=6cm]{Images/alignment_workflow.PNG}
-        \caption{Figure 1: A basic idea for a workflow to recover full genome ``alignments'' of all sequenced accessions using bam files. Note, this is not a traditional alignment in the sense that accession data was not pairwise-aligned; instead, the alignment of accessions stems from high-quality/stringency mapping to an identical reference sequence. \emph{This is still being refined.}}
+        \caption{A basic idea for a workflow to recover full genome ``alignments'' of all sequenced accessions using bam files. Note, this is not a traditional alignment in the sense that accession data was not pairwise-aligned; instead, the alignment of accessions stems from high-quality/stringency mapping to an identical reference sequence. \emph{This is still being refined.}}
 \end{figure}
 
 At the first hurdle, an issue was encountered. The bfctools ``consensus'' command requires that an indexed vcf/bcf file be used. Unfortunately, the output of ANGSD does not seem to directly meet these criteria. Indexing can simply be completed using the ``bgzip'' and ``tabix'' packages (see \url{https://www.biostars.org/p/367960/}) but these are not immediately available through the Nix repository. Instead, I will attempt to use an entirely bcftools-based approach suggested by user ``pd3'' at the following link: \url{https://github.com/samtools/bcftools/issues/668}. Essentially, this involved first converting the bcf file to a zipped vcf, and then indexing the zipped vcf file.
@@ -288,27 +297,93 @@ To see if the consensus contruction, variant insertion, and masking worked, I wr
  \begin{figure}[!h]
          \centering
          \includegraphics[height=4cm]{Images/SeaViewMSA_1.PNG}
-         \caption{Figure 2: An example of low diversity genomic stretches which are common throught the multiple species alignment (MSA), at least for this considered genomic region.}
+         \caption{An example of low diversity genomic stretches which are common throught the multiple species alignment (MSA), at least for this considered genomic region.}
  \end{figure}
 
  \begin{figure}[!h]
          \centering
          \includegraphics[height=4cm]{Images/SeaViewMSA_2.PNG}
-         \caption{Figure 3: An example of sparse but high interspecific diversity genomic loci in the multiple species alignment (MSA), at least for this considered genomic region.}
+         \caption{An example of sparse but high interspecific diversity genomic loci in the multiple species alignment (MSA), at least for this considered genomic region.}
  \end{figure}
 
  \begin{figure}[!h]
          \centering
          \includegraphics[height=4cm]{Images/SeaViewMSA_3.PNG}
-         \caption{Figure 4: An example of reasonably common``gappy'' domains of the multiple species alignment (MSA), at least for this considered genomic region.}
+         \caption{An example of reasonably common``gappy'' domains of the multiple species alignment (MSA), at least for this considered genomic region.}
  \end{figure}
 
-I have split the scaffolds into abutting windows of 100000 bp (see scripts ``7.1-.sh'', ``7.2-.sh'', and ``7.3-SplitScaffoldsIntoAlignedWindows.sh'') that can be used to infer species topologies along scaffolds and assemble a consensus tree with ASTRAL III (ref). I plan to use trimAl to cut out gappy regions of these alignments. Then, I want to apply AMAS (ref) to determine the quality of trimmed alignments and to provide a metric for the filtering of useful alignments. In the process of reading up on AMAS, I've discovered it may be capable of splitting fastas into abutting windows, as is accomplished by my ``7.X'' series of scripts.  
+I have split the scaffolds into abutting windows of 100,000 bp (see scripts ``7.1-PrepareFileStructureForAlignments.sh'', ``7.2-PrepareBEDFileForAlignments.sh'', and ``7.3-SplitScaffoldsIntoAlignedWindows.sh'') that can be used to infer species topologies along scaffolds and assemble a consensus tree with ASTRAL III \cite{zhang2018}. I plan to use trimAl to cut out gappy regions of these alignments. Then, I want to apply AMAS \cite{borowiec2016} to determine the quality of trimmed alignments and to provide a metric for the filtering of useful alignments. In the process of reading up on AMAS, I've discovered it may be capable of splitting fastas into abutting windows, as is accomplished by my ``7.X'' series of scripts.
+
+On the cluster, it is impossible to submit more than 50 jobs to the queue at once. My scripts are set up to parallelize jobs based on a file which contains the name of all 110 BTS1 reference scaffolds. I have split this file into three subsidiary files using \verb!head -n 50 /bettik/greenwom/WGS/Alignments/scaffold_list.txt >/bettik/greenwom/WGS/Alignments/scaffold_list_p1.txt!, \verb!head -n 100 /bettik/greenwom/WGS/Alignments/scaffold_list.txt | tail -n 50 >/bettik/greenwom/WGS/Alignments/scaffold_list_p2.txt!, and \verb!tail -n 10 /bettik/greenwom/WGS/Alignments/scaffold_list.txt >/bettik/greenwom/WGS/Alignments/scaffold_list_p3.txt! to run the script ``7.3-SplitScaffoldsIntoAlignedWindows.sh'' for all scaffolds. \\
 
 Things still to do: filter by mapping quality before making consensus genomes; mask repeat regions. Also, it could be worthwhile to try less stringent ANGSD filtering; e.g., min allele frequency of \~0 and a lower minInd.
 
+\section*{Tuesday, 5 April 2022}
+\subsection*{\underline{Localizing \emph{Wolbachia} Contamination}}
+Many species of butterfly are infected with a genus of bacteria called \emph{Wolbachia} (see refs). As these bacteria are inherited matralinealy and can impact a host's fitness (often in a sex-depedent manner), persistent \emph{Wolbachia} infection can affect a lineage's demography and can drive selective sweeps in parts of the genome (refs). It is, therefore, interesting to determine whether \emph{Wolbachia} infection is present in our dataset.
+
+I'll first see if it is present in the genome by running BLAST, as was done for the detection of scaffolds hosting mtDNA on 22 March 2022. A recent paper \cite{lucek2021} isolated \emph{Wolbachia} from \emph{Erebia cassioides}, a butterfly species closely related to \emph{Coenonympha} taxa. The assembly of this genome was recovered (from \url{https://www.ncbi.nlm.nih.gov/assembly/GCF_018555315.1/}), unzipped on the cluster, and used to make a blast database.
+
+On the first try there appear to be zero matches. It might be worthwhile to tweak the sensitivity of BLAST given the potential phylogenetic distance between \emph{Erebia cassioides} and putative \emph{Coenonympha} strains of the bacterium. Additionally, the reference species/individual may just not be infected. For interests sake, the reads of all accessions could be blasted against the \emph{Wolbachia} reference to probe for individual-level infections.
+
+
+\section*{Monday, 25 April 2022}
+\subsection*{\underline{Running trimAl}}
+In developing a small pipeline for the trimming of genomic alignments, I have discovered that trimAl - which is the workhorse for my trimming operation - does not recognize the gap character ("N") in the alignments, and therefore trims erroneously. \\
+It does not seem that this behaviour can be altered using trimAl options. To get around this issue, inside the script that calls trimAl (``''), I've used the code:
+
+\begin{codewrap}
+   sed '/>/\! s/N/-/g' alignment.fa > alignment_test.fa
+\end{codewrap}
+to make a temporary file in which Ns (those which are not present in fasta headers) are converted to the hyphen gap character. The temporary file is then dumped at the end of the trimAl run. This is not particularly computationally efficient, and it could be more viable to just assign the hyphen instead of an N as a gap character during initial consensus genome construction (in script ``''). \\
+This seems to have allowed trimAl to run properly. However, for some reason, the trimAL parameter file (made in script ``'') throws up an error when launcing a queued job on the cluster. For now, porting the contents of the parameter file to a new file in the home directory has fixed the issue. \\
+In the process of organizing this, I've come across a misconception of mine (with the help of Maya Gueguen). I previously considered that when running an array job, the \verb!${1}! vriable refers to the entirity of the current line in the parameter file. Instead, it refers to the first item in the current line of the considered parameter file (with white-space separation). This means a great deal of my script made to loop through independent alignment files in each line were unnecessary. However, looping through these parameters provides a hidden challenge, one that can be circumvented with some of the ``indirection expansion'' approaches used in a post on StackOverflow (\url{https://stackoverflow.com/questions/37053780/iterate-over-arguments-in-a-bash-script-and-make-use-of-their-numbers}).
+
+\section*{Thursday, 5 May 2022}
+\subsection*{\underline{Reconfiguring ANGSD}}
+
+The initial ANGSD script (``4.2-GenotypingANGSD.sh'') was quite strict. Variant positions were only retained if found across at least 32 (out of a possible 40) samples (-minInd 32) and if SNPs were highly supported (-SNP\_pval 1e-6). In reality, we have a great deal of missing data for more diverged samples (in relation to the reference), meaning that these criteria may be limiting our detection of variants between accessions. Accordingly, these parameters have been changed as follows: -minInd 1; -SNP\_pval 1. Along with increased sensitivity to SNPs or fixed differences amongst samples, this approach will increase the likelihood of retaining sequencing errors. To offset this risk, the minimum depth with which a genotype at a site must be supported has been increased from 3 to 5 (-setMinDepthInd option).
+
+After running the adapted script, ANGSD returned only 827 000 SNP loci, fewer than the 1.3 million loci recovered previously. I have tweaked the script again to completely discount the SNP \emph{p}-value to see if it makes a difference.
+Without the SNP cut-off, roughly 1.4 million loci are recovered. This is curious, as it was expected that every recoverable genotype should be returned. For example, with high mapping coverage accessions (such as those belonging to \emph{C}. \emph{arcania}), I presumed that the genotype for every mapped base (which would amount to roughly 80\% of the 600 million bases of the reference genome) would be recovered by ANGSD. The parameters should be looked at again. I can imagine that the 1) the genotype likelihood option set to 0.9 is quite strict, and/or that 2) matches to the reference genome are not returned as called sites. The second option would be perculiar though, as the polymorphism rate across the genome of \emph{Coenonympha} would end up extremely low ((1400000/600000000)*100 = 0.2\%).
+
+I wanted to test the script again, as overall I have noted that variant density can be quite low in some areas. As an example, in the presumed mitochondrial region - scaffold\_109 (see entry on 22 March 2022) - there are only two informative/variable sites amongst all of my accessions. In the original ANGSD script, there is a cut-off sequence depth value in place to avoid the genotyping of potential paralogous sites. This could be limiting the detection of sites in mtDNA, which are typically present at high copy numbers in each individual. In addition, the GATK model (add reference!; option \verb!GL 2! in ANGSD) has been used for calculating genotype likelihoods. However, GATK seems to underperform when analysing non-human genomes (references!) - I have therefore attempted to swap to the SAMtools genotype likelihood model (reference; option \verb!GL 1! in ANGSD). These changes, in addition to those listed in the above paragraphs of this journal entry have been captured in a new script, entitled ``4.2-GenotypingANGSD\_relaxed.sh''.
+
+The above-described script has yielded roughly 30 million genotyped positions across all accessions, with 58 000 - 2 500 000 genotypes being reported per accession (see Figure 5). Counts of recovered genotypes were obtained by pulling the number of applied variants from the output files specified in the ``6.2-GetConsensusGenomesBCFTools.sh'' script as follows:
+
+\begin{codewrap}
+  # Use awk to pull the second white-space delimited field of the standard output generated by the bcftools consensus command. The output routes into the standard error file and contains only a single line, in the form ``Applied {a number} variants''.
+  awk '{print $2}' 6.2*err > bcftools_consensus_applied_variants.csv
+
+\end{codewrap}
+
+\begin{figure}[!h]
+        \centering
+        \includegraphics[height=6cm]{Images/number_of_applied_variants.PNG}
+        \caption{Histogram of the number of genotyped variants recovered per species. Graphic constructed with the R script, ``genotypes\_applied\_to\_genomes.R'' in the ``wgs\_data\_overview'' project.}
+\end{figure}
+
+This seems more in line with expectations of genome diversity. As an example, there are now approximately 1100 segrating sites in the mtDNA region (scaffold\_109), as opposed to the two informative sites identified previously.
+
+Nevertheless, I have not swapped from GATK to SAMtools as intended. Additionally, I realize I have also been using the option \verb!skip_triallelic 1! in ANGSD. Removing triallelic sites is important for minimizing the impact of sequencing errors when looking at population-level diversity patterns, as 1) many SNP loci are only segregating for only 2 alleles at a time within species (reference?) and 2) most population genetic models implicity assume that SNP loci are biallelic. In my context, however, it is realistic to assume that the same SNP positions could house more than two different bases across the many species considered. Retaining triallelic positions during the ANGSD run may, therefore, be important. I am, however, concerned that this may introduce genotyping errors within each species. It will be important to discuss this with Laurence and Thibaut.
+
+In the future, it could also be interesting to try something like ATLAS (\cite{link2017}; see demonstration of efficacy in \cite{duchen2020}), a haplotype caller designed specifically for phylogenomic studies rather than population-level genotype calling.
+
+\section*{Thursday, 19 May 2022}
+\subsection*{\underline{Using CIPRES}}
+While I wait for the IQ-TREE package to be installed on the cluster, I wanted to start examining some trees and get an idea of how to stitch together the pipeline for tree assembly. To this end, I will be making trees of some genomic regions using the IQ-TREE package available on the CIPRES platform (\url{https://www.phylo.org/index.php/}).
+
+I have just randomly selected 10 genomic windows from scaffold\_1 of the genome alignments for \emph{Coenonympha}.
+
+\begin{listing}
+    \begin{minted}{Python}
+        def hello_world():
+            print("Hello floating world!")
+    \end{minted}
+    \caption{Floating listing.}
+    \label{lst:hello}
+\end{listing}
+
 \bibliography{citations}
-
-
 
 \end{document}
